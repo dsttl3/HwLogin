@@ -1,0 +1,42 @@
+apply plugin: 'com.huawei.ohos.hap'
+apply plugin: 'com.huawei.ohos.decctest'
+
+apply plugin: 'com.huawei.agconnect'
+//For instructions on signature configuration, see https://developer.harmonyos.com/cn/docs/documentation/doc-guides/ide_debug_device-0000001053822404#section1112183053510
+ohos {
+    signingConfigs {
+        debug {
+            storeFile file('E:\\debugKEY\\debug_l3.p12')
+            storePassword '000000184FB4A7BDB613C069CE48352E1D4B22FEA27B9B97FAECEFD9135463DA9C032A40A238613D'
+            keyAlias = 'login'
+            keyPassword '00000018783A624BE2BB7ACB4A7D84CD58C4895035D3104E7ECA1A2F7FD6ED4B0324E68F3974665E'
+            signAlg = 'SHA256withECDSA'
+            profile file('E:\\debugKEY\\loginDebug.p7b')
+            certpath file('E:\\debugKEY\\login.cer')
+        }
+    }
+    compileSdkVersion 7
+    defaultConfig {
+        compatibleSdkVersion 5
+    }
+    buildTypes {
+        release {
+            proguardOpt {
+                proguardEnabled false
+                rulesFiles 'proguard-rules.pro'
+            }
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.har'])
+    testImplementation 'junit:junit:4.13.1'
+    ohosTestImplementation 'com.huawei.ohos.testkit:runner:1.0.0.200'
+
+    implementation 'com.huawei.hms:hwid-ohos:6.1.0.301'
+    implementation 'com.huawei.agconnect:agconnect-core-harmony:1.0.0.300'
+}
+decc {
+    supportType = ['html', 'xml']
+}
