@@ -101,6 +101,7 @@ public class MainAbilitySlice extends AbilitySlice {
                 // 静默登录成功后，根据结果中获取到的帐号基本信息更新UI
 
                 text.setText(authAccount.getDisplayName() + "\n登录成功。\nAccessToken = " + authAccount.getIdToken());
+                // 更新按钮显示
                 buttonLogin.setVisibility(Component.VERTICAL);
                 btnSignOut.setVisibility(Component.VISIBLE);
                 btnCancelAuthorization.setVisibility(Component.VISIBLE);
@@ -122,7 +123,7 @@ public class MainAbilitySlice extends AbilitySlice {
                         public void onSuccess(AuthAccount account) {
                             // 从account中获取授权码code
                             String code = account.getAuthorizationCode();
-                            //获取凭证Access Token
+                            //获取凭证Access Token  （获取Access Token操作需在服务器端操作，这里只是为了演示操作过程）
                             new Thread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -139,6 +140,7 @@ public class MainAbilitySlice extends AbilitySlice {
                                         @Override
                                         public void run() {
                                             text.setText(account.getDisplayName() + "\n登录成功。" + json);
+                                            // 更新按钮显示
                                             buttonLogin.setVisibility(Component.VERTICAL);
                                             btnSignOut.setVisibility(Component.VISIBLE);
                                             btnCancelAuthorization.setVisibility(Component.VISIBLE);
@@ -181,7 +183,8 @@ public class MainAbilitySlice extends AbilitySlice {
             @Override
             public void onSuccess(Void aVoid) {
 //                Log.i(TAG, "signOut Success");
-                text.setText("signOut Success");
+                text.setText("账号退出成功");
+                // // 更新按钮显示
                 buttonLogin.setVisibility(Component.VISIBLE);
                 btnSignOut.setVisibility(Component.VERTICAL);
                 btnCancelAuthorization.setVisibility(Component.VERTICAL);
@@ -190,7 +193,7 @@ public class MainAbilitySlice extends AbilitySlice {
             @Override
             public void onFailure(Exception e) {
 //                Log.i(TAG, "signOut fail");
-                text.setText("signOut fail");
+                text.setText("账号退出失败：" + e.getLocalizedMessage());
             }
         });
     }
@@ -214,6 +217,7 @@ public class MainAbilitySlice extends AbilitySlice {
             public void onSuccess(Void v) {
                 // 取消授权成功
                 text.setText("取消授权成功");
+                // 更新按钮显示
                 buttonLogin.setVisibility(Component.VISIBLE);
                 btnSignOut.setVisibility(Component.VERTICAL);
                 btnCancelAuthorization.setVisibility(Component.VERTICAL);
