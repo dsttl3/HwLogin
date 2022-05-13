@@ -35,7 +35,6 @@ public class MainAbilitySlice extends AbilitySlice {
         btnSignOut = findComponentById(ResourceTable.Id_btn_sign_out);
         btnCancelAuthorization = findComponentById(ResourceTable.Id_btn_cancelAuthorization);
 
-
         btnSignOut.setVisibility(Component.VERTICAL);
         btnCancelAuthorization.setVisibility(Component.VERTICAL);
 
@@ -100,7 +99,8 @@ public class MainAbilitySlice extends AbilitySlice {
             public void onSuccess(AuthAccount authAccount) {
                 // 静默登录成功后，根据结果中获取到的帐号基本信息更新UI
 
-                text.setText(authAccount.getDisplayName() + "\n登录成功。\nAccessToken = " + authAccount.getIdToken());
+                text.setText(authAccount.getDisplayName() + "\n登录成功。\nAuthorizationCode = "
+                        + authAccount.getAuthorizationCode());
                 // 更新按钮显示
                 buttonLogin.setVisibility(Component.VERTICAL);
                 btnSignOut.setVisibility(Component.VISIBLE);
