@@ -58,7 +58,7 @@
         "name": "cn.dsttl3.hwlogin.MainAbility",
         "icon": "$media:icon",
         "description": "$string:mainability_description",
-        "label": "$string:entry_MainAbility",
+        "label": "$string:app_Name",
         "type": "page",
         "launchType": "standard"
       }

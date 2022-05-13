@@ -1,27 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <DirectionalLayout
     xmlns:ohos="http://schemas.huawei.com/res/ohos"
     ohos:height="match_parent"
     ohos:width="match_parent"
-    ohos:alignment="center"
     ohos:orientation="vertical">
 
-    <Text
-        ohos:id="$+id:text_helloworld"
-        ohos:height="match_content"
-        ohos:width="match_content"
-        ohos:background_element="$graphic:background_ability_main"
-        ohos:layout_alignment="horizontal_center"
-        ohos:text=""
-        ohos:text_size="18vp"
-        />
 
-    <Button
-        ohos:id="$+id:btn_login"
-        ohos:height="match_content"
-        ohos:width="match_content"
-        ohos:padding="3vp"
-        ohos:background_element="#aaaaaa"
-        ohos:text="华为登录"
-        ohos:text_size="40vp"/>
+    <ScrollView
+        ohos:height="match_parent"
+        ohos:width="match_parent">
+
+        <DirectionalLayout
+            ohos:height="match_content"
+            ohos:width="match_parent"
+            ohos:alignment="center"
+            ohos:orientation="vertical">
+
+            <Text
+                ohos:id="$+id:text_helloworld"
+                ohos:height="match_content"
+                ohos:width="match_content"
+                ohos:background_element="$graphic:background_ability_main"
+                ohos:layout_alignment="horizontal_center"
+                ohos:multiple_lines="true"
+                ohos:text="未登录"
+                ohos:text_alignment="center"
+                ohos:text_size="18vp"
+                />
+
+            <Button
+                ohos:id="$+id:btn_login"
+                ohos:height="160px"
+                ohos:margin="16vp"
+                ohos:width="824px"
+                ohos:background_element="$graphic:capsule_button_element"
+                ohos:text_size="18vp"
+                ohos:text_color="#ffffff"
+                ohos:text="登录"/>
+
+            <Button
+                ohos:id="$+id:btn_sign_out"
+                ohos:height="160px"
+                ohos:width="824px"
+                ohos:margin="16vp"
+                ohos:background_element="$graphic:capsule_button_element"
+                ohos:text_size="18vp"
+                ohos:text_color="#ffffff"
+                ohos:text="退出登录"/>
+
+            <Button
+                ohos:id="$+id:btn_cancelAuthorization"
+                ohos:height="160px"
+                ohos:width="824px"
+                ohos:margin="16vp"
+                ohos:background_element="$graphic:capsule_button_element"
+                ohos:text_size="18vp"
+                ohos:text_color="#ffffff"
+                ohos:text="取消授权"/>
+        </DirectionalLayout>
+    </ScrollView>
+
 </DirectionalLayout>

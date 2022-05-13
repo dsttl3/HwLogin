@@ -1,6 +1,7 @@
 package cn.dsttl3.hwlogin.slice;
 
 import cn.dsttl3.hwlogin.ResourceTable;
+import cn.dsttl3.hwlogin.utils.OkUtil;
 import com.huawei.hms.accountsdk.exception.ApiException;
 import com.huawei.hms.accountsdk.support.account.AccountAuthManager;
 import com.huawei.hms.accountsdk.support.account.request.AccountAuthParams;
@@ -15,23 +16,48 @@ import ohos.aafwk.content.Intent;
 import ohos.agp.components.Button;
 import ohos.agp.components.Component;
 import ohos.agp.components.Text;
+import okhttp3.FormBody;
+import okhttp3.RequestBody;
 
 public class MainAbilitySlice extends AbilitySlice {
 
     Text text;
-    Button button;
+    Button buttonLogin;
+    Button btnSignOut;
+    Button btnCancelAuthorization;
 
     @Override
     public void onStart(Intent intent) {
         super.onStart(intent);
         super.setUIContent(ResourceTable.Layout_ability_main);
         text = findComponentById(ResourceTable.Id_text_helloworld);
-        button = findComponentById(ResourceTable.Id_btn_login);
+        buttonLogin = findComponentById(ResourceTable.Id_btn_login);
+        btnSignOut = findComponentById(ResourceTable.Id_btn_sign_out);
+        btnCancelAuthorization = findComponentById(ResourceTable.Id_btn_cancelAuthorization);
 
-        button.setClickedListener(new Component.ClickedListener() {
+
+        btnSignOut.setVisibility(Component.VERTICAL);
+        btnCancelAuthorization.setVisibility(Component.VERTICAL);
+
+
+        buttonLogin.setClickedListener(new Component.ClickedListener() {
             @Override
             public void onClick(Component component) {
                 huaweiIdSignIn();
+            }
+        });
+
+        btnSignOut.setClickedListener(new Component.ClickedListener() {
+            @Override
+            public void onClick(Component component) {
+                signOut();
+            }
+        });
+
+        btnCancelAuthorization.setClickedListener(new Component.ClickedListener() {
+            @Override
+            public void onClick(Component component) {
+                cancelAuthorization();
             }
         });
 
@@ -74,7 +100,10 @@ public class MainAbilitySlice extends AbilitySlice {
             public void onSuccess(AuthAccount authAccount) {
                 // 静默登录成功后，根据结果中获取到的帐号基本信息更新UI
 
-                text.setText(authAccount.getDisplayName()+"\n登录成功。");
+                text.setText(authAccount.getDisplayName() + "\n登录成功。\nAccessToken = " + authAccount.getIdToken());
+                buttonLogin.setVisibility(Component.VERTICAL);
+                btnSignOut.setVisibility(Component.VISIBLE);
+                btnCancelAuthorization.setVisibility(Component.VISIBLE);
 
             }
         });
@@ -92,10 +121,31 @@ public class MainAbilitySlice extends AbilitySlice {
                         @Override
                         public void onSuccess(AuthAccount account) {
                             // 从account中获取授权码code
-                            account.getAuthorizationCode();
-
-                            text.setText("授权code：" + account.getAuthorizationCode());
-
+                            String code = account.getAuthorizationCode();
+                            //获取凭证Access Token
+                            new Thread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    RequestBody requestBody = new FormBody.Builder()
+                                            .add("grant_type", "authorization_code")
+                                            .add("client_id", "106205123")
+                                            .add("client_secret", "fe0e68f057eb4c6e5a2071ebec4a0beff7642c731140bc8ebccdb1238383e85c")
+                                            .add("code", code)
+                                            .add("redirect_uri", "https://api.dsttl3.cn/hwlogin")
+                                            .build();
+                                    String json = OkUtil.post("https://oauth-login.cloud.huawei.com/oauth2/v3/token", requestBody);
+                                    System.out.println(json);
+                                    getUITaskDispatcher().asyncDispatch(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            text.setText(account.getDisplayName() + "\n登录成功。" + json);
+                                            buttonLogin.setVisibility(Component.VERTICAL);
+                                            btnSignOut.setVisibility(Component.VISIBLE);
+                                            btnCancelAuthorization.setVisibility(Component.VISIBLE);
+                                        }
+                                    });
+                                }
+                            }).start();
                         }
                     });
                     task.addOnFailureListener(new OnFailureListener() {
@@ -105,11 +155,80 @@ public class MainAbilitySlice extends AbilitySlice {
                                 ApiException apiException = (ApiException) e;
                                 // 登录失败，status code标识了失败的原因，请参见API参考中的错误码了解详细错误原因
                                 apiException.getStatusCode();
-
                                 text.setText("登录失败 code：" + apiException.getStatusCode());
                             }
                         }
                     });
+                }
+            }
+        });
+    }
+
+    private void signOut() {
+        AccountAuthService accountAuthService;
+        AccountAuthParams accountAuthParams = new AccountAuthParamsHelper(AccountAuthParams.DEFAULT_AUTH_REQUEST_PARAM)
+                .setAuthorizationCode()
+                .createParams();
+        try {
+            accountAuthService = AccountAuthManager.getService(accountAuthParams);
+        } catch (ApiException e) {
+            // 处理初始化登录授权服务失败，status code标识了失败的原因，请参见API参考中的错误码了解详细错误原因
+            e.getStatusCode();
+            return;
+        }
+        Task<Void> signOutTask = accountAuthService.signOut();
+        signOutTask.addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+//                Log.i(TAG, "signOut Success");
+                text.setText("signOut Success");
+                buttonLogin.setVisibility(Component.VISIBLE);
+                btnSignOut.setVisibility(Component.VERTICAL);
+                btnCancelAuthorization.setVisibility(Component.VERTICAL);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+//                Log.i(TAG, "signOut fail");
+                text.setText("signOut fail");
+            }
+        });
+    }
+
+    private void cancelAuthorization() {
+        AccountAuthService accountAuthService;
+        AccountAuthParams accountAuthParams = new AccountAuthParamsHelper(AccountAuthParams.DEFAULT_AUTH_REQUEST_PARAM)
+                .setEmail()
+                .createParams();
+        try {
+            accountAuthService = AccountAuthManager.getService(accountAuthParams);
+        } catch (ApiException e) {
+            // 处理初始化登录授权服务失败，status code标识了失败的原因，请参见API参考中的错误码了解详细错误原因
+            e.getStatusCode();
+            return;
+        }
+        // 调用取消授权接口
+        Task<Void> task = accountAuthService.cancelAuthorization();
+        task.addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void v) {
+                // 取消授权成功
+                text.setText("取消授权成功");
+                buttonLogin.setVisibility(Component.VISIBLE);
+                btnSignOut.setVisibility(Component.VERTICAL);
+                btnCancelAuthorization.setVisibility(Component.VERTICAL);
+            }
+        });
+
+        task.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception e) {
+                // 取消授权失败
+                if (e instanceof ApiException) {
+                    ApiException apiException = (ApiException) e;
+                    // 华为帐号取消授权失败，status code标识了失败的原因，请参见API参考中的错误码了解详细错误原因
+                    apiException.getStatusCode();
+                    text.setText("取消授权失败：" + apiException.getStatusCode());
                 }
             }
         });

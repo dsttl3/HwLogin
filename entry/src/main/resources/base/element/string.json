@@ -11,6 +11,9 @@
     {
       "name": "mainability_HelloWorld",
       "value": "Hello World"
+    },{
+      "name": "app_Name",
+      "value": "HwLogin"
     }
   ]
 }
